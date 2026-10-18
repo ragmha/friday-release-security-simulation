@@ -12,4 +12,8 @@ public sealed class InvoicesController(InvoiceStore store) : ControllerBase
 {
     [HttpGet]
     public IReadOnlyList<Invoice> List() => store.ListForTenant(User.TenantId());
+
+    [HttpGet("search")]
+    public IReadOnlyList<Invoice> Search([FromQuery] string number) =>
+        store.FindByNumber(User.TenantId(), number);
 }
