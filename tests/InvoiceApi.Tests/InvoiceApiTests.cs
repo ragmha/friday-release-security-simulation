@@ -34,6 +34,24 @@ public sealed class InvoiceApiTests(WebApplicationFactory<Program> factory)
         Assert.Equal("INV-1001", Assert.Single(invoices).Number);
     }
 
+    [Fact]
+    public async Task Search_does_not_return_another_tenants_invoice()
+    {
+        var invoices = await GetInvoices(TenantA, "/invoices/search?number=INV-2001");
+
+        Assert.Empty(invoices);
+    }
+
+    [Fact]
+    public async Task Search_treats_sql_like_input_as_data()
+    {
+        var number = Uri.EscapeDataString("' OR '1'='1");
+
+        var invoices = await GetInvoices(TenantA, $"/invoices/search?number={number}");
+
+        Assert.Empty(invoices);
+    }
+
     private async Task<Invoice[]> GetInvoices(string apiKey, string path)
     {
         var client = factory.CreateClient();
