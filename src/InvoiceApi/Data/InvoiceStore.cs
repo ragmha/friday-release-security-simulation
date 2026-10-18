@@ -60,6 +60,15 @@ public sealed class InvoiceStore : IDisposable
         return Read(command);
     }
 
+    public IReadOnlyList<Invoice> FindByNumber(string number)
+    {
+        using var connection = Open();
+        using var command = connection.CreateCommand();
+        command.CommandText =
+            $"SELECT Number, BilledTo, Total FROM Invoices WHERE Number = '{number}'";
+        return Read(command);
+    }
+
     public void Dispose() => _keepAlive.Dispose();
 
     private SqliteConnection Open()
